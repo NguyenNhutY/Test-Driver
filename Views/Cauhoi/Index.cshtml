@@ -1,0 +1,49 @@
+﻿@model List<Cau>
+@{
+    int i = 0;
+}
+
+<a href="../Cauhoi/them" class="btn btn-primary mt-3">Thêm</a>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Câu hỏi</th>
+            <th style="width:140px;" scope="col" class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Cau item in Model)
+        {
+            i++;
+            <tr>
+                <td class="text-center">
+                    @if (item.Ttcaus.ElementAt(0).Diemliet)
+                    {
+                        <span class="text-danger font-weight-bold">
+                            @i
+                            @* / @item.IdCau *@
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            @i
+                            @* / @item.IdCau *@
+                        </span>
+                    }
+                </td>
+                <td class="text-start">
+                    @item.Ttcaus.ElementAt(0).Cauhoi
+                </td>
+                <td class="text-center">
+                    <a href="../Cauhoi/sua?id=@item.IdCau" class="btn btn-primary">Sửa</a>
+                    <a href="../Cauhoi/xoa?id=@item.IdCau" class="btn btn-danger">Xóa</a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3"><hr class="m-0" /></td>
+            </tr>
+        }
+    </tbody>
+</table>

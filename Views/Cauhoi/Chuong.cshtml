@@ -1,0 +1,95 @@
+﻿@model List<Chuong>
+
+@{
+    ViewBag.Title = "Quản lý Chương";
+}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .container {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        color: #007bff;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #dee2e6;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #007bff;
+        color: #ffffff;
+    }
+
+    a {
+        text-decoration: none;
+        color: #007bff;
+        margin-right: 10px;
+    }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-color: #f5c6cb;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Quản lý Chương</h2>
+    <a class="btn btn-primary mb-3" asp-action="themchuong">Thêm chương</a>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col"><label asp-for="First().IdChuong"></label></th>
+                <th scope="col"><label asp-for="First().ThongTinChuong"></label></th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Chuong c in Model)
+            {
+                <tr>
+                    <td>@c.IdChuong</td>
+                    <td>@c.ThongTinChuong</td>
+                    <td style="min-width:130px;">
+                        <a class="btn btn-primary btn-sm" href="SuaChuong/@c.IdChuong">Sửa</a>
+                        <a class="btn btn-danger btn-sm" href="XoaChuong/@c.IdChuong">Xóa</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3"><hr class="m-0" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

@@ -1,0 +1,587 @@
+﻿@page
+<div id="questionOverlay" class="overlay">
+    <button id="closeOverlayBtn"><img width="64" height="64" src="https://img.icons8.com/nolan/64/exit.png" alt="exit" /></button>
+    <div id="selectedQuestions" class="selected-questions h-100">
+
+        <!--Show-->
+    </div>
+</div>
+<style>
+    /* Default styles for mainContent and test_content */
+    .choose-val {
+        display: flex;
+        align-items: center;
+    }
+
+    .index-span {
+        width: 30px; /* Adjust the width as needed */
+        text-align: center;
+        margin-right: 10px; /* Adjust the margin as needed */
+    }
+
+    .select_btn {
+        min-width: 5vw;
+        min-height: 5vh;
+    }
+
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        overflow-y: auto;
+    }
+
+    .selected-questions {
+        background: #fff;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: start;
+        overflow-y: auto; /* Enable vertical scrolling within the content */
+    }
+
+    #closeOverlayBtn{
+        height:10%;
+        color:red;
+        background-color: white;
+        font-size:2em;
+    }
+
+    #goiy {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+    }
+
+    #test_content {
+        margin-top: 20px;
+    }
+
+    .question-container {
+        margin-top: 20px;
+    }
+
+    .question-order {
+        font-size: 1.8em;
+        margin-bottom: 10px;
+    }
+
+    .options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .choose-val {
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        padding: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .choose-val:hover {
+        background-color: blue;
+    }
+
+    .index-span {
+        width: 30px;
+        text-align: center;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .btn-check {
+        display: none;
+    }
+
+
+    .select_btn {
+        min-width: 5vw;
+        min-height: 5vh;
+    }
+
+    #questionOverlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        overflow-y: auto;
+        opacity: 0; /* Initial opacity set to 0 for fade-in effect */
+        transition: opacity 0.1s, width 1s,height 0.5s; /* Smooth transition for opacity changes */
+        
+    }
+
+    .overlay-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    #prevBtn,
+    #nextBtn,
+    #submitBtn,
+    #selectQuestionBtn {
+        font-size: 1.2em;
+        padding: 3px 6px;
+        margin: 5px;
+    }
+
+    #closeOverlayBtn {
+        height: 100%;
+        color: #fff;
+        background-color: transparent;
+        font-size: 1.5em;
+        border: none;
+        border-radius: 5px;
+    }
+
+        #closeOverlayBtn:hover {
+            background-color: #0056b3;
+        }
+
+    #increase-font-size,
+    #decrease-font-size {
+        background-color:transparent;
+        border-radius: 30%;
+        border: none;
+    }
+</style>
+
+<div class="container">
+    <div class="container d-flex flex-column justify-content-center align-items-center">
+        <div class="container mb-4">
+            <div class="form-check form-switch fs-5">
+                <label for="auto-switch" class="form-check-label"> Tự động chuyển câu: Tắt</label>
+                <input type="checkbox" id="auto-switch" class="form-check-input">
+            </div>
+            <span class="align-self-center"><i>Kích thước chữ: </i></span>
+                <button id="increase-font-size">
+                <img width="40" height="40" src="https://img.icons8.com/ultraviolet/40/plus--v3.png" alt="plus--v3" />
+            </button>
+                <button id="decrease-font-size" class="btn-lg btn-primary">
+                <img width="40" height="40" src="https://img.icons8.com/ultraviolet/40/minus.png" alt="minus" />
+            </button>
+        </div>
+        
+        <div class="row m-2">
+            <button id="selectQuestionBtn" class="btn btn-success">Chọn câu hỏi</button>
+        </div>
+        
+        <div class="row" id="select_question">
+        </div>
+        <div class="row mt-4">
+            <button class="btn btn-secondary m-1" id="prevBtn">Trước</button>
+            <button class="btn btn-secondary m-1" id="nextBtn">Tiếp</button>
+        </div>
+    </div>
+    <div id="goiy">
+    </div>
+    <div class="container mt-4" id="test_content">
+        <div class="container" id="content">
+            <!-- Your content for test_content goes here -->
+        </div>
+    </div>
+</div>
+
+
+<script>
+    class Questions {
+        #question;
+        #id;
+        #length;
+
+        constructor(id) {
+            this.#id = id;
+            this.#getQuestion();
+        }
+
+        #getQuestion() {
+            $.ajax({
+                url: `${getLink}`,
+                type: 'POST',
+                data: { id: id },
+                dataType: 'json',
+                success: (response) => {
+                    this.#question = response.$values;
+                    this.#length = this.#question.length; 
+
+                  
+                    ques = Array(lsQuestion.getLength()).fill(-1);
+                    displaySelectedQuestions();
+                    showQuestion(0);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    alert('Lỗi: ' + status);
+                }
+            });
+        }
+
+        getValueQuestion() {
+            return this.#question;
+        }
+
+        getValueQuestionByIndex(index) {
+            return this.#question[index];
+        }
+
+        getCorrectQuestionByIndex(index) {
+            return this.#question[index].Dapans.$values.findIndex(c => c.Dapandung) + 1; // 0 1 2 -> 1 2 3
+        }
+
+        getParalysis(index) {
+            return (this.#question[index].Ttcaus.$values[0].Diemliet == 1) ? true : false;
+        }
+
+        getSuggest(index) {
+            return this.#question[index].Ttcaus.$values[0].Goiy;
+        }
+
+        getLength() {
+            return this.#length;
+        }
+    }
+    document.addEventListener('keydown', function (event) {
+        // Check which key was pressed
+        switch (event.keyCode) {
+            // Down, Right arrow key
+
+            case 40:
+            case 39:
+                if (currentQuestionIndex < lsQuestion.getLength() - 1) {
+                    currentQuestionIndex++;
+                    showQuestion(currentQuestionIndex);
+                }
+                break;
+
+            // Left, Up arrow key
+            case 38:
+            case 37:
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    showQuestion(currentQuestionIndex);
+                }
+                break;
+
+            // Number keys (1, 2, 3, 4)
+            case 49: // 1
+            case 50: // 2
+            case 51: // 3
+            case 52: // 4
+                // Convert the key to a number and use it as the selected answer
+                let selectedAnswer = parseInt(event.key);
+                chooseQuestion(currentQuestionIndex, selectedAnswer);
+                break;
+
+            // Add more key checks as needed
+
+            default:
+                break;
+        }
+    });
+    $('#auto-switch').change(() => {
+        if ($('#auto-switch').is(":checked")) {
+            $('label[for="auto-switch"]').text("Tự động chuyển câu: Bật")
+            autoSwitchEnabled = true;
+        }
+        else {
+            $('label[for="auto-switch"]').text("Tự động chuyển câu: Tắt")
+            autoSwitchEnabled = false;
+        }
+    });
+
+    function autoSwitch(index = currentQuestionIndex) {
+        if ($('#auto-switch').is(":checked")) {
+            startAutoSwitch(index);
+        }
+    }
+
+    function startAutoSwitch(index) {
+        setTimeout(function () {
+            if (index < lsQuestion.getLength() - 1) {
+                showQuestion(index + 1);
+            }
+        }, 1000); // Thay đổi số 2000 thành số thời gian tùy chỉnh (ms) giữa các câu hỏi.
+    }
+
+    // Kích thước font chữ ban đầu
+    let fontSize = 1;
+
+    // Sự kiện tăng kích thước
+    $('#increase-font-size').click(function () {
+        if (fontSize < 2) {
+            fontSize += 0.1;
+            updateFontSize();
+        }
+    });
+
+    // Sự kiện giảm kích thước
+    $('#decrease-font-size').click(function () {
+        if (fontSize > 0.6) {
+            fontSize -= 0.1;
+            updateFontSize();
+        }
+    });
+
+    // Hàm cập nhật kích thước font chữ
+    function updateFontSize() {
+        $('.choose-val').css('font-size', fontSize + 'em');
+        $('.question-order').css('font-size', fontSize + 'em');
+    }
+
+    function updateSelectQuestionButtons(index) {
+        $('#select_question button')[index].addClass('choosed');
+    }
+
+    // Sự kiện nút Trước
+    $('#prevBtn').click(() => {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            showQuestion(currentQuestionIndex);
+        }
+        updateFontSize();
+    });
+
+    // Sự kiện nút Tiếp
+    $('#nextBtn').click(() => {
+        if (currentQuestionIndex < lsQuestion.getLength() - 1) {
+            currentQuestionIndex++;
+            showQuestion(currentQuestionIndex);
+        }
+        updateFontSize();
+    });
+
+    // Show danh sách câu hỏi
+    $('#selectQuestionBtn').click(function () {
+        $('#questionOverlay').css('display', 'flex').animate({ opacity: 1 }, 300);
+    });
+
+    // Hide danh sách câu hỏi
+    $('#closeOverlayBtn').click(function () {
+        $('#questionOverlay').animate({ opacity: 0 }, 300, function () {
+            $(this).css('display', 'none');
+        });
+    });
+
+    // Display selected danh sách câu hỏi
+    function displaySelectedQuestions() {
+        renderSelectQuestion();
+        $.ajax({
+            url: "/LyThuyet/LayCauDaLam",
+            type: 'POST',
+            data: { id: id },
+            dataType: 'json',
+            success: (response) => {
+                showQuestionDone(response['0']);
+                response['1'].forEach((e, i) => {
+                    ques[response[0][i]] = e;
+                });
+                showQuestion(0);
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr);
+                alert('Lỗi: ' + status);
+            }
+        });
+    }
+
+    function renderSelectQuestion() {
+        const selectedQuestionsDiv = $('#selectedQuestions');
+        selectedQuestionsDiv.empty();
+        var chuong = 1;
+        selectedQuestionsDiv.append(`<blockquote class="blockquote"><p class="mb-0">${lsQuestion.getValueQuestionByIndex(0).IdChuongNavigation.ThongTinChuong}<p></blockquote>`)
+        for (let i = 0; i < lsQuestion.getLength(); i++) {
+            if (lsQuestion.getValueQuestionByIndex(i).IdChuong != chuong) {
+                chuong = lsQuestion.getValueQuestionByIndex(i).IdChuong;
+                selectedQuestionsDiv.append(`<blockquote class="blockquote"><p class="mb-0">${lsQuestion.getValueQuestionByIndex(i).IdChuongNavigation.ThongTinChuong}<p></blockquote>`)
+            }
+            const isSelected = ques[i] > -1;
+            const selectedQuestionButton = $(`
+                                    <button style="width:60px;" class="btn btn-${isSelected ? 'success' : 'secondary'} m-1 text-left"
+                                    onclick="selectQuestion(${i})" id="select_ques_${i}">
+                                ${i + 1}
+                            </button>
+                        `);
+
+            selectedQuestionsDiv.append(selectedQuestionButton);
+        }
+    }
+
+    function showQuestionDone(res) {
+        res.forEach(e => {
+            $("#select_ques_" + (e)).addClass("btn-success")
+            $("#select_ques_" + (e)).removeClass("btn-secondary")
+        })
+    }
+
+    // Function to select a question and update the display
+    function selectQuestion(index) {
+        currentQuestionIndex = index;
+        showQuestion(index); // Update the display
+        $('#questionOverlay').hide();
+    }
+
+    // Chọn câu hỏi
+    function chooseQuestion(questionIndex, chooseIndex = ques[questionIndex] /*Lấy lựa chọn*/) {
+        ques[questionIndex] = chooseIndex;
+        if (chooseIndex > -1) {
+
+            let chooseAnswerIndex = lsQuestion.getCorrectQuestionByIndex(questionIndex); // Đáp án đúng trong mảng là 1-based
+
+            let showChoose = `#choice${questionIndex}-${chooseIndex}`;
+            let showAnswer = `#choice${questionIndex}-${chooseAnswerIndex}`;
+
+            // Gỡ bỏ màu nền của tất cả các lựa chọn
+            $('.choose-val').css("background-color", "transparent");
+
+            // Đặt màu nền của lựa chọn đã chọn thành màu xanh (red)
+            $(showChoose).parent('.choose-val').css("background-color", "red");
+            $(showChoose).prop("checked", true);
+
+            //Đánh dấu câu hỏi đã làm
+            $("#select_ques_" + questionIndex).addClass("btn-success")
+            $("#select_ques_" + questionIndex).removeClass("btn-secondary")
+
+            // Đặt màu nền của lựa chọn đúng thành màu blue (blue)
+            $(showAnswer).parent('.choose-val').css("background-color", "blue");
+            //Hiển thị gợi ý nếu có
+            let goiy = lsQuestion.getSuggest(questionIndex)
+            if (goiy != '')
+                $('#goiy').html(`<p><strong>Gợi ý: </strong><i>${goiy}<p></i>`);
+
+
+
+            //Thêm vào danh sách câu hỏi đã làm
+            $.ajax({
+                url: "/LyThuyet/ThemCau",
+                type: 'POST',
+                data: { id: questionIndex, index: chooseIndex }, // Use optional chaining to handle null values
+                dataType: 'json',
+                success: (response) => {
+                    if (chooseAnswerIndex != chooseIndex) {
+                        $.ajax({
+                            url: "/LyThuyet/ThemCauSai",
+                            type: 'POST',
+                            data: { id: lsQuestion.getValueQuestionByIndex(questionIndex).Stt }, // Use optional chaining to handle null values
+                            dataType: 'json',
+                            success: (response) => {
+
+                            },
+                            error: function (xhr, status, error) {
+                                console.error(xhr);
+                                alert('Lỗi: ' + status);
+                            }
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    alert('Lỗi: ' + status);
+                }
+            });
+
+            if (showAnswer == showChoose) {
+                autoSwitch();
+            }
+        }
+    }
+
+    // Hiển thị câu hỏi tại chỉ số index
+    function showQuestion(index) {
+        currentQuestionIndex = index;
+        let item = lsQuestion.getValueQuestionByIndex(index);
+        $('#content').empty();
+        var row = `<div style="width: 100%; font-size: 1.5rem;" class="question-container">
+                            <div class="question-order ${lsQuestion.getParalysis(index) ? 'text-danger' : ''}">
+                                <u><b>Câu hỏi ${index + 1}</b></u><sup>${lsQuestion.getValueQuestionByIndex(index).IdCau}</sup> :
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                <img id="image${index}" class="py-4 rounded img-fluid w-md-50 d-none" src="" alt="Hình ảnh câu hỏi ${index + 1}">
+                            </div>
+                            <div class="options button-group flex flex-col space-y-4">`;
+
+
+        $.each(item.Dapans.$values, (indexQ, c) => {
+            row += `    <div class="choose-val w-full p-2 flex items-center space-x-4 border-solid m-2 border border-2" onclick="chooseQuestion(${index},${indexQ + 1});">
+                                            <span class="index-span">${indexQ + 1}</span>
+                                            <input type="radio" class="btn-check" name="question" id="choice${index}-${indexQ + 1}">
+                                            <label class="ml-2 w-100" for="choice${index}-${indexQ + 1}">${c.Dapan1}</label>
+                                        </div>
+                                    `;
+        });
+
+        row += '</div></div>';
+        $('#content').append(row);
+
+        if (item.Ttcaus.$values[0].Hinhcauhoi == "iQ==") {
+            $.ajax({
+                url: "/LyThuyet/LayHinHCauHoi",
+                type: 'POST',
+                data: { id: lsQuestion.getValueQuestionByIndex(index).IdCau },
+                dataType: 'json',
+                success: (response) => {
+                    item.Ttcaus.$values[0].Hinhcauhoi = response;
+                    if (item.Ttcaus.$values[0].Hinhcauhoi != "") {
+                        $(`#image${index}`).addClass("d-inline");
+                        $(`#image${index}`).removeClass("d-none");
+                        $(`#image${index}`).attr('src', 'data:image/jpeg;base64,' + item.Ttcaus.$values[0].Hinhcauhoi);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr);
+                    alert('Lỗi: ' + status);
+                }
+            });
+        }
+        else if (item.Ttcaus.$values[0].Hinhcauhoi != null) {
+            $(`#image${index}`).addClass("d-inline");
+            $(`#image${index}`).removeClass("d-none");
+            $(`#image${index}`).attr('src', 'data:image/jpeg;base64,' + item.Ttcaus.$values[0].Hinhcauhoi);
+        }
+        $('.question-order').append(item.Ttcaus.$values[0].Cauhoi);
+
+        $('#goiy').html("<p><p>");
+
+
+        // Gọi chooseQuestion() sau khi đối tượng questions đã được tải thành công
+        chooseQuestion(index);
+        updateFontSize();
+    }
+
+    //Get set đáp án danh sách chọn
+    function getChooseQuestion(questionIndex) {
+        return ques[questionIndex];
+    }
+
+    // Make sure to focus on an element that can receive keyboard input
+    document.body.setAttribute('tabindex', 0);
+    document.body.focus();
+
+    var id = '@ViewBag.Cookies';
+    var modeTest = "@ViewBag.setTest";
+    var getLink = "/LyThuyet/LayCauHoi";
+    let currentQuestionIndex = 0; // Chỉ số của câu hỏi hiện tại
+    let autoSwitchEnabled = false;
+    let ques = [];
+    const lsQuestion = new Questions(id);
+    
+
+</script>

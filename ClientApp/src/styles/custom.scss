@@ -1,0 +1,176 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+
+/* Provide sufficient contrast against white background */
+
+
+code {
+    color: #E01A76;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+.choose-val {
+    display: flex;
+    align-items: center;
+
+    &:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+}
+
+.index-span {
+    width: 30px; /* Adjust the width as needed */
+    text-align: center;
+    margin-right: 10px; /* Adjust the margin as needed */
+    font-weight: bold;
+}
+
+.select_btn {
+    min-width: 5vw;
+    min-height: 5vh;
+}
+
+.overlay {
+    display: none;
+/*    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;*/
+    overflow-y: auto;
+}
+
+.selected-questions {
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: start;
+    overflow-y: auto; /* Enable vertical scrolling within the content */
+}
+
+#closeOverlayBtn {
+    height: 10%;
+    color: red;
+    background-color: white;
+    font-size: 2em;
+}
+
+#goiy {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+}
+
+#test_content {
+    margin-top: 20px;
+}
+
+.question-container {
+    margin-top: 20px;
+}
+
+.question-order {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-check {
+    display: none;
+}
+
+#questionOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    opacity: 0; /* Initial opacity set to 0 for fade-in effect */
+    transition: ease-in-out 0.1s, width 1s, height 0.5s; /* Smooth transition for opacity changes */
+}
+
+.overlay-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+#prevBtn,
+#nextBtn,
+#submitBtn,
+#selectQuestionBtn {
+    font-size: 1.2em;
+    padding: 3px 6px;
+    margin: 5px;
+}
+
+#closeOverlayBtn {
+    height: 100%;
+    color: #fff;
+    background-color: transparent;
+    font-size: 1.5em;
+    border: none;
+    border-radius: 5px;
+
+    &:hover {
+        background-color: #0056b3;
+    }
+}
+
+#increase-font-size,
+#decrease-font-size {
+    background-color: transparent;
+    border-radius: 30%;
+    border: none;
+}
+
+.loading-spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Thay đổi kích thước tùy theo cần thiết */
+}
+
+.loading-spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #4c51bf; /* Thay đổi màu sắc tùy theo ý muốn */
+    border-radius: 50%;
+    width: 50px; /* Thay đổi kích thước tùy theo cần thiết */
+    height: 50px; /* Thay đổi kích thước tùy theo cần thiết */
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

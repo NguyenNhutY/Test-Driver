@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+}
+@model DataUser
+@{
+    List<Hang> ls = ViewBag.hang;
+}
+@if (Model != null)
+{
+    Hang h = ls.FirstOrDefault(h => h.IdHang + "" == Model.Id);
+    <h1>Bạn chọn hạng thi @h.Thongtin</h1>
+    <h2>@h.Thongtinchitiet</h2>
+}
+else
+{
+    <h2>Chào mừng bạn</h2>
+    <h1>Để học lý thuyết và thi thử vui lòng chọn hạng GPLX</h1>
+}  
+

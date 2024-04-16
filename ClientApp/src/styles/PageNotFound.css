@@ -1,0 +1,33 @@
+﻿.cont-404 img {
+    height: 100%;
+    width: 100%;
+}
+
+.cont-404 .button {
+    padding: 12px 15px;
+    background-color: var(--gradient-text-o);
+    border: none;
+    border-radius: 12px;
+    color: #ffff;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+    .cont-404 .button:hover {
+        color: var(--gradient-text-o);
+        background: rgba(255, 255, 255, 0);
+    }
+*{
+    padding:0%;
+    margin:0%;
+    box-sizing:border-box;
+
+}
+
+.cont-404{
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}

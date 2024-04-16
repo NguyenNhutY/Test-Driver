@@ -1,0 +1,146 @@
+﻿@model List<HangChuong>
+
+@{
+    string action = "";
+    Hang h = null;
+    if (ViewBag.edit == true)
+    {
+        ViewBag.Title = "Sửa hạng";
+        action = "suahang";
+        h = ViewBag.Hang;
+    }
+    else {
+        ViewBag.Title = "Thêm hạng";
+        action = "themhang";
+    }
+    string[] soluongs = new string[ViewBag.Chuong.Count];
+    
+  
+}
+<div class="container mt-4">
+    <h2>@ViewBag.Title</h2>
+    
+    <form asp-action="@action" asp-controller="cauhoi" method="post" class="container">
+        <div asp-validation-summary="All"></div>
+        <input asp-for="ElementAt(0).IdChuongNavigation.IdChuong" value="1" hidden />
+        <input asp-for="ElementAt(0).IdChuongNavigation.ThongTinChuong" value="1" hidden />
+        @if (ViewBag.edit != true)
+        {
+            <div class="form-group">
+                <label asp-for="ElementAt(0).IdHang" class="font-weight-bold"></label>
+                <input asp-for="ElementAt(0).IdHangNavigation.IdHang" class="form-control" />
+                <span asp-validation-for="ElementAt(0).IdHangNavigation.IdHang"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ElementAt(0).IdHangNavigation.Thongtin" class="font-weight-bold"></label>
+                <input asp-for="ElementAt(0).IdHangNavigation.Thongtin" class="form-control" />
+                <span asp-validation-for="ElementAt(0).IdHangNavigation.Thongtin"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ElementAt(0).IdHangNavigation.Thongtinchitiet" class="font-weight-bold"></label>
+                <input asp-for="ElementAt(0).IdHangNavigation.Thongtinchitiet" class="form-control" />
+                <span asp-validation-for="ElementAt(0).IdHangNavigation.Thongtinchitiet"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ElementAt(0).IdHangNavigation.Diemtoida" class="font-weight-bold"></label>
+                <input asp-for="ElementAt(0).IdHangNavigation.Diemtoida" class="form-control" />
+                <span asp-validation-for="ElementAt(0).IdHangNavigation.Diemtoida"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ElementAt(0).IdHangNavigation.Diemtoitheu" class="font-weight-bold"></label>
+                <input asp-for="ElementAt(0).IdHangNavigation.Diemtoitheu" class="form-control" />
+                <span asp-validation-for="ElementAt(0).IdHangNavigation.Diemtoitheu"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ElementAt(0).IdHangNavigation.Thoigianthi" class="font-weight-bold"></label>
+                <input asp-for="ElementAt(0).IdHangNavigation.Thoigianthi" class="form-control" />
+                <span asp-validation-for="ElementAt(0).IdHangNavigation.Thoigianthi"></span>
+            </div>
+            for (int i = 0; i < ViewBag.Chuong.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <label>@ViewBag.Chuong[i].ThongTinChuong</label>
+                            <br />
+                            <label asp-for="ElementAt(0).Soluong"></label>
+                            <input name="Soluong[]" />
+                        </div>
+                    </td>
+                </tr>
+            }
+            <button type="submit" class="btn btn-primary">Thêm</button>
+        }
+        else
+        {
+            <div class="form-group" hidden>
+                <label asp-for="ElementAt(0).IdHang" class="font-weight-bold"></label>
+                <input asp-for="ElementAt(0).IdHangNavigation.IdHang" class="form-control" />
+                <span asp-validation-for="ElementAt(0).IdHangNavigation.IdHang"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ElementAt(0).IdHangNavigation.Thongtin" class="font-weight-bold"></label>
+                <input asp-for="ElementAt(0).IdHangNavigation.Thongtin" class="form-control" value="@h.Thongtin" />
+                <span asp-validation-for="ElementAt(0).IdHangNavigation.Thongtin"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ElementAt(0).IdHangNavigation.Thongtinchitiet" class="font-weight-bold"></label>
+                <input asp-for="ElementAt(0).IdHangNavigation.Thongtinchitiet" class="form-control" value="@h.Thongtinchitiet" />
+                <span asp-validation-for="ElementAt(0).IdHangNavigation.Thongtinchitiet"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ElementAt(0).IdHangNavigation.Diemtoida" class="font-weight-bold"></label>
+                <input asp-for="ElementAt(0).IdHangNavigation.Diemtoida" class="form-control" value="@h.Diemtoida" />
+                <span asp-validation-for="ElementAt(0).IdHangNavigation.Diemtoida"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ElementAt(0).IdHangNavigation.Diemtoitheu" class="font-weight-bold"></label>
+                <input asp-for="ElementAt(0).IdHangNavigation.Diemtoitheu" class="form-control" value="@h.Diemtoitheu" />
+                <span asp-validation-for="ElementAt(0).IdHangNavigation.Diemtoitheu"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ElementAt(0).IdHangNavigation.Thoigianthi" class="font-weight-bold"></label>
+                <input asp-for="ElementAt(0).IdHangNavigation.Thoigianthi" class="form-control" value="@h.Thoigianthi"/>
+                <span asp-validation-for="ElementAt(0).IdHangNavigation.Thoigianthi"></span>
+            </div>
+
+            int j = 0;
+            int i = 0;
+            for (; i < ViewBag.Chuong.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <label>@ViewBag.Chuong[i].ThongTinChuong</label>
+                            <br />
+                            <label asp-for="ElementAt(0).Soluong"></label>
+                            @try
+                            {
+                                if (Model.ElementAt(j).IdChuong == @ViewBag.Chuong[i].IdChuong)
+                                {
+                                    <input name="Soluong[]" value="@Model.ElementAt(j++).Soluong" />
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                <input name="Soluong[]" value="0" />
+                            }
+                        </div>
+                     </td>
+                </tr>
+            }
+         
+            <button type="submit" class="btn btn-primary">@ViewBag.Title</button>
+        }
+        
+                
+    </form>
+</div>

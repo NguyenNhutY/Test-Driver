@@ -1,0 +1,25 @@
+﻿@model Chuong
+
+@{
+    ViewBag.Title = "Thêm chương";
+}
+
+<div class="container mt-4">
+    <h2>@ViewBag.Title</h2>
+    <form asp-action="themchuong" asp-controller="cauhoi" method="post" class="container">
+        <div asp-validation-summary="All"></div>
+
+        <div class="form-group">
+            <label asp-for="IdChuong" class="font-weight-bold"></label>
+            <input asp-for="IdChuong" class="form-control" />
+            <span asp-validation-for="IdChuong"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ThongTinChuong" class="font-weight-bold"></label>
+            <input asp-for="ThongTinChuong" class="form-control" />
+            <span asp-validation-for="ThongTinChuong"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">@ViewBag.Title</button>
+    </form>
+</div>

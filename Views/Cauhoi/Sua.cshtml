@@ -1,0 +1,182 @@
+﻿@model Cau
+@{
+    Layout = "_Layout";
+    Cau cauhoi = ViewBag.cauhoi;
+    int count = Model.Dapans.Count;
+    List<SelectListItem> lsTopic = new List<SelectListItem>();
+    foreach (Chuong c in ViewBag.chuong)
+    {
+        lsTopic.Add(new SelectListItem(c.IdChuong + "", c.IdChuong + ""));
+    }
+    int n = Model.IdChuong;
+    lsTopic.ElementAt(n - 1).Selected = true;
+    var action = "Them";
+}
+
+<form method="post" action="../Cauhoi/@action" enctype="multipart/form-data">
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table">
+                    <tr>
+                        <td>
+                            <label asp-for="IdCau" class="form-label"></label>
+                            <input class="form-control" asp-for="IdCau" readonly />
+                        </td>
+                        <td>
+                            <label class="form-label" for="required">@Html.DisplayNameFor(model => model.Ttcaus.ElementAt(0).Diemliet)</label>
+                            <div class="form-switch">
+                                <input class="form-check-input" type="checkbox" name="required" id="required" @(Model.Ttcaus.ElementAt(0).Diemliet ? "checked" : "") />
+                            </div>
+                        </td>
+                        <td>
+                            <label asp-for="IdChuongNavigation.IdChuong" class="form-label"></label>
+                            <select class="form-control" asp-items="@lsTopic" asp-for="IdChuongNavigation.IdChuong"></select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <label asp-for="Ttcaus.ElementAt(0).Cauhoi" class="form-label"></label>
+                            <input class="form-control" asp-for="Ttcaus.ElementAt(0).Cauhoi" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <label asp-for="Ttcaus.ElementAt(0).Hinhcauhoi" class="form-label"></label>
+                            <input type="file" class="form-control-file" name="hinh" id="hinh" />
+                            @if (Convert.ToBase64String(Model.Ttcaus.ElementAt(0).Hinhcauhoi) != "")
+                            {
+                                <img id="image" src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.Ttcaus.ElementAt(0).Hinhcauhoi))" alt="Hình ảnh câu hỏi" />
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <label asp-for="Ttcaus.ElementAt(0).Goiy" class="form-label"></label>
+                            <input class="form-control" asp-for="Ttcaus.ElementAt(0).Goiy" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <table class="form-row">
+                                @foreach (Hang h in ViewBag.hang)
+                                {
+                                    <td>
+                                        <label for="tthang">@h.Thongtin</label>
+                                        @if (Model.HangCaus.Any(e => e.IdHang == h.IdHang))
+                                        {
+                                            <select class="form-control w-auto" name="tthang[]">
+                                                <option selected value="1"> Có </option>
+                                                <option value="0"> Không </option>
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            <select class="form-control w-auto" name="tthang[]">
+                                                <option value="1"> Có </option>
+                                                <option selected value="0"> Không </option>
+                                            </select>
+                                        }
+                                    </td>
+                                }
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Loop for Luachons -->
+                    <tr>
+                        <td colspan="3">
+                            <table class="table" id="luachon">
+                                @for (int i = 0; i < count; i++)
+                                {
+                                    List<SelectListItem> lsitem = new List<SelectListItem>();
+                                    lsitem.Add(new SelectListItem() { Text = "Đúng", Value = "True" });
+                                    lsitem.Add(new SelectListItem() { Text = "Sai", Value = "False" });
+                                    <tr id="luachon-@i">
+                                        <td>
+                                            <div class="row mb-2">
+                                                <div class="col-md-4">
+                                                    <label asp-for="Dapans.ElementAt(i).Dapandung" class="form-label m-2"></label>
+                                                    <select class="form-control" asp-for="Dapans.ElementAt(i).Dapandung" name="Correct[]">
+                                                        <option value="True"> Đúng </option>
+                                                        <option value="False"> Sai </option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label asp-for="Dapans.ElementAt(i).Dapan1" class="form-label m-2"></label>
+                                                    <input asp-for="Dapans.ElementAt(i).Dapan1" class="form-control" name="Text[]" />
+                                                </div>
+                                                <div class="col-md-2 d-flex align-items-end">
+                                                    <a href="#" onclick="xoaluachon(@i)" class="btn btn-danger m-1">Xóa</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <button type="button" class="btn btn-primary" id="them">Thêm lựa chọn</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <input type="submit" class="btn btn-success" id="submit" value="THÊM" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</form>
+
+<style>
+    .form-label {
+        font-weight: bold;
+    }
+
+    .form-check-label {
+        margin-left: 0.75rem;
+        font-weight: bold;
+    }
+</style>
+
+<script>
+    let count = @count;
+    $('#them').click(() => {
+        themluachon();
+    });
+
+    function themluachon() {
+        $('#luachon').append(
+            `<tr id="luachon-${count}">
+                    <td>
+                        <div class="row mb-2">
+                            <div class="col-md-4">
+                                <label class="form-label m-2" for="Dapandung">Đáp án đúng</label>
+                                <select class="form-control" id="Dapandung" name ="Correct[]" >
+                                    <option value="True" > Đúng </option>
+                                    <option value="False" selected> Sai </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label m-2" for="Dapan1">Chi tiết lựa chọn</label>
+                                <input class="form-control" id="Dapan1" name="Text[]" />
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <a href="#" onclick="xoaluachon(${count})" class="btn btn-danger m-1">Xóa</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>`
+        );
+        count++;
+    }
+
+    function xoaluachon(id) {
+        $(`#luachon-${id}`).remove();
+        count--;
+    }
+</script>

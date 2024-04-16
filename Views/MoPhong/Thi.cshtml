@@ -1,0 +1,59 @@
+﻿@{
+}
+
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-7 col-md-12 d-flex justify-content-center">
+            <video id="myVideo" style="width:100%;">
+                <source src="/mp/TH01.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <div class="col-lg-5 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Chọn tình huống</h2>
+                    <form id="question-form" class="d-flex flex-wrap flex-sm-row justify-content-center">
+                        @for (int i = 1; i <= 120; i++)
+                        {
+                            <div class="form-label m-1">
+                                <a class="btn btn-success" style="min-width:53px;" href="#myideo" onclick="goToQuestion(@i)">@i</a>
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+       
+    </div>
+
+    
+</div>
+
+
+<!-- Thêm mã nguồn JavaScript của bạn -->
+<script>
+    function scrollToElement(elementId) {
+        var element = document.getElementById(elementId);
+        if (element) {
+            element.scrollIntoView({ behavior: "smooth" });
+        }
+    }
+    function goToQuestion(questionNumber) {
+        var video = document.getElementById("myVideo");
+        var newVideoSrc = "/mp/TH" + padNumber(questionNumber) + ".mp4";
+        scrollToElement("myVideo");
+
+        video.pause();
+        video.src = newVideoSrc;
+        video.load();
+        video.play();
+    }
+    // Hàm để thêm số 0 trước số nếu số đó chỉ có một chữ số
+    function padNumber(number) {
+        return number < 10 ? "0" + number : number;
+    }x
+</script>

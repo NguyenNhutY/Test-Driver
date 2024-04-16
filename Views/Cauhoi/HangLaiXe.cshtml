@@ -1,0 +1,44 @@
+﻿@model List<Hang>
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="container mt-4">
+    <a class="btn btn-primary mb-3" asp-action="themhang">Thêm hạng</a>
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col" class="align-middle text-center">Mã hạng</th>
+                <th scope="col" class="align-middle text-center">Thông tin hạng</th>
+                <th scope="col" class="align-middle text-center">Chi tiết thông tin hạng</th>
+                <th scope="col" class="align-middle text-center">Điểm tối đa</th>
+                <th scope="col" class="align-middle text-center">Điểm tối thiểu</th>
+                <th scope="col" class="align-middle text-center">Thời gian thi</th>
+                <th scope="col" class="align-middle text-center">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Hang h in Model)
+            {
+                <tr>
+                    <td class="align-middle text-center">@h.IdHang</td>
+                    <td class="align-middle text-center">@h.Thongtin</td>
+                    <td>@h.Thongtinchitiet</td>
+                    <td class="align-middle text-center">@h.Diemtoida</td>
+                    <td class="align-middle text-center">@h.Diemtoitheu</td>
+                    <td class="align-middle text-center">@h.Thoigianthi</td>
+                    <td style="width:110px" class="align-middle text-center">
+                        <a class="btn btn-primary btn-sm" href="suahang/@h.IdHang">Sửa</a>
+                        <a class="btn btn-danger btn-sm" href="xoahang/@h.IdHang">Xóa</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3"><hr class="m-0" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
