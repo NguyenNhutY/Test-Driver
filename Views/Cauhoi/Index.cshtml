@@ -1,49 +1,154 @@
 ﻿@model List<Cau>
+
 @{
-    int i = 0;
+    List<Hang> hang = ViewBag.hang;
 }
+<style>
+    /* Tùy chỉnh các phần của DataTable */
+    .dataTables_length,
+    .dataTables_info,
+    .dataTables_paginate {
+        margin-top: 10px; /* Khoảng cách với các phần khác */
+    }
+
+    .dataTables_paginate {
+        float: right; /* Căn phải các nút điều hướng */
+    }
+
+    .dataTables_filter label {
+        font-weight: bold; /* In đậm label */
+    }
+
+    .dataTables_filter input {
+        margin-left: 5px; /* Khoảng cách với input tìm kiếm */
+    }
+
+    #dataTable_length{
+        margin: 5px;
+    }
+
+    /* Tùy chỉnh màu sắc của nút điều hướng */
+    .paginate_button {
+        background-color: #4CAF50;
+        color: white;
+        border: 1px solid transparent;
+    }
+
+        .paginate_button.current {
+            background-color: #45a049; /* Màu nút trang hiện tại */
+        }
+
+        .paginate_button:hover {
+            background-color: #45a049; /* Màu khi hover */
+        }
+
+    /* Tùy chỉnh kích thước và giao diện các nút điều hướng */
+    .paginate_button {
+        padding: 5px 10px;
+        border-radius: 3px;
+    }
+
+    /* Tùy chỉnh màu chữ của các phần thông tin */
+    .dataTables_length,
+    .dataTables_info,
+    .dataTables_paginate {
+        color: #333;
+    }
+
+    /* Tùy chỉnh kích thước chữ của các phần thông tin */
+    .dataTables_length,
+    .dataTables_info,
+    .dataTables_paginate,
+    .dataTables_filter label,
+    .dataTables_filter input {
+        font-size: 14px;
+    }   
+</style>
 
 <a href="../Cauhoi/them" class="btn btn-primary mt-3">Thêm</a>
-<table class="table table-bordered table-hover">
-    <thead>
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">Câu hỏi</th>
-            <th style="width:140px;" scope="col" class="text-center">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (Cau item in Model)
+
+<div class="mt-3">
+    <label for="filterRank">Chọn hạng:</label>
+    <select id="filterRank" class="form-select">
+        <option value="">Tất cả</option>
+        @foreach (var item in hang)
         {
-            i++;
-            <tr>
-                <td class="text-center">
-                    @if (item.Ttcaus.ElementAt(0).Diemliet)
-                    {
-                        <span class="text-danger font-weight-bold">
-                            @i
-                            @* / @item.IdCau *@
-                        </span>
-                    }
-                    else
-                    {
-                        <span>
-                            @i
-                            @* / @item.IdCau *@
-                        </span>
-                    }
-                </td>
-                <td class="text-start">
-                    @item.Ttcaus.ElementAt(0).Cauhoi
-                </td>
-                <td class="text-center">
-                    <a href="../Cauhoi/sua?id=@item.IdCau" class="btn btn-primary">Sửa</a>
-                    <a href="../Cauhoi/xoa?id=@item.IdCau" class="btn btn-danger">Xóa</a>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="3"><hr class="m-0" /></td>
-            </tr>
+            <option value="@item.IdHang">@item.Thongtin</option>
         }
-    </tbody>
-</table>
+    </select>
+</div>
+
+<div class="table mt-3">
+    <table id="dataTable" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>  
+                <th scope="col">Câu hỏi</th>
+                <th scope="col">Chương</th>
+                <th style="width:140px;" scope="col" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var table = $('#dataTable').DataTable({
+                data: @Html.Raw(Json.Serialize(Model)),
+                columns: [
+                    { data: 'stt' },
+                    { data: 'ttcaus[0].cauhoi' },
+                    { data: 'idChuong' },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return '<a href="../Cauhoi/sua?id=' + data.idCau + '" class="btn btn-primary btn-sm">Sửa</a>' +
+                                '<a href="../Cauhoi/xoa?id=' + data.idCau + '" class="btn btn-danger btn-sm">Xóa</a>';
+                        }
+                    }
+                ],
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Tất cả"]], // Chọn số lượng hàng trên mỗi trang
+                "language": {
+                    "lengthMenu": "Hiển thị _MENU_ câu hỏi trên mỗi trang",
+                    "zeroRecords": "Không tìm thấy câu hỏi nào",
+                    "info": "Hiển thị trang _PAGE_ của _PAGES_",
+                    "infoEmpty": "Không có dữ liệu",
+                    "infoFiltered": "(đã lọc từ _MAX_ câu hỏi)",
+                    "search": "Tìm kiếm:",
+                    "paginate": {
+                        "first": "Đầu",
+                        "last": "Cuối",
+                        "next": "Tiếp",
+                        "previous": "Trước"
+                    }
+                }
+            });
+
+            $('#filterRank').change(function () {
+                var selectedRank = $('#filterRank').val();
+                if (selectedRank == "")
+                    return;
+                $('#dataTable tbody tr').each(function () {
+                    var rowData = table.row($(this)).data();
+                    var filteredHangCaus = rowData.hangCaus.filter(function (hangCau) {
+                        return hangCau.idHang === parseInt(selectedRank);
+                    });
+                    if (filteredHangCaus.length > 0) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                        $('#filterRank').val("");
+                    }
+                        
+                });
+            });
+        });
+
+    </script>
+}

@@ -9,6 +9,7 @@ const DarkModeToggle = ({ darkMode, toggleDarkMode }) => {
         // Nếu darkMode được bật, thiết lập màu nền của body thành #212121
         if (darkMode) {
             document.body.style.backgroundColor = "#212121";
+
         } else {
             document.body.style.backgroundColor = "";
 // Xóa lớp dark-mode khỏi body

@@ -9,6 +9,7 @@ using System.Dynamic;
 using DemoGPLX.Models;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 namespace DemoGPLX.Controllers
 {
@@ -25,10 +26,12 @@ namespace DemoGPLX.Controllers
             try
             {
                 UserGplx dtu = JsonConvert.DeserializeObject<UserGplx>(HttpContext.Request.Cookies["UserGplx"]);
-                if (CheckLogin(dtu.Username, dtu.Password))
+                if (!CheckLogin(dtu.Username, dtu.Password))
                 {
-                    return View(QuestionUtil.GetAllQuestion());
+                    return RedirectToAction("Login");
                 }
+                ViewBag.hang = QuestionUtil.GetAllHang().ToList();
+                return View(QuestionUtil.GetAllQuestion());
             }
             catch (Exception ex)
             {
@@ -83,7 +86,6 @@ namespace DemoGPLX.Controllers
             catch { return RedirectToAction("Login"); }
             ViewBag.hang = QuestionUtil.GetAllHang();
             ViewBag.chuong = QuestionUtil.GetAllChuong();
-            ViewBag.edit = true;
             return View(QuestionUtil.GetQuestionWithID(id));
         }
 
@@ -120,7 +122,7 @@ namespace DemoGPLX.Controllers
 
             ViewBag.chuong = QuestionUtil.GetAllChuong();
             ViewBag.edit = false;
-            return View("Sua",QuestionUtil.newQuestion());
+            return View(QuestionUtil.newQuestion());
         }
 
         [HttpPost]
@@ -135,70 +137,160 @@ namespace DemoGPLX.Controllers
                     return RedirectToAction("Login");
                 }
             }
+
             catch { return RedirectToAction("Login"); }
+
             int idCau = int.Parse(Request.Form["IdCau"].ToString());
             bool diemLiet = !string.IsNullOrEmpty(Request.Form["required"]);
             int idChuong = int.Parse(Request.Form["IdChuongNavigation.IdChuong"].ToString());
-            string cauHoi = Request.Form["Cauhoi"].ToString(); 
+            string cauHoi = Request.Form["Cauhoi"].ToString();
             string goiY = Request.Form["Goiy"].ToString();
             string[] tthangs = Request.Form["tthang[]"];
             string[] correctValues = Request.Form["Correct[]"];
             string[] textValues = Request.Form["Text[]"];
-            Cau cauNew = new Cau() { IdCau = idCau,IdChuong = idChuong, Stt = idCau};
+
+            Cau cauNew = new Cau() { IdCau = idCau, IdChuong = idChuong, Stt = idCau };
+                QuestionUtil.GetContext().Caus.Add(cauNew);
+                await QuestionUtil.GetContext().SaveChangesAsync();
+                
+
+                List<Ttcau> ttcau = new List<Ttcau>() { new Ttcau() { IdTtcau = idCau, IdCau = idCau, Cauhoi = cauHoi, Diemliet = diemLiet, Goiy = goiY } };
+
+                byte[] fileBytes = new byte[0];
+
+                if (hinh != null && hinh.Length > 0)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        hinh.CopyTo(memoryStream);
+                        fileBytes = memoryStream.ToArray();
+                    }
+                }
+
+                ttcau.ElementAt(0).Hinhcauhoi = fileBytes;
+
+                QuestionUtil.GetContext().Ttcaus.RemoveRange(QuestionUtil.GetContext().Ttcaus.Where(e => e.IdCau == idCau).ToList());
+                QuestionUtil.GetContext().Ttcaus.AddRange(ttcau);
+                /** Add Dapans **/
+                QuestionUtil.GetContext().Dapans.RemoveRange(QuestionUtil.GetContext().Dapans.Where(d => d.IdCau == cauNew.IdCau));
+                List<Dapan> dapans = new List<Dapan>();
+                for (int j = 0; j < textValues.Length; j++)
+                {
+                    dapans.Add(new Dapan()
+                    {
+                        IdCau = idCau,
+                        IdDapan = j + 1,
+                        Dapan1 = textValues[j],
+                        Dapandung = bool.Parse(correctValues[j])
+                    });
+                }
+
+                QuestionUtil.GetContext().HangCaus.RemoveRange(QuestionUtil.GetContext().HangCaus.Where(h => h.IdCau == cauNew.IdCau));
+                int i = 0;
+                foreach (Hang h in QuestionUtil.GetAllHang())
+                {
+                    if (tthangs[i++] == "1")
+                    {
+                        QuestionUtil.GetContext().HangCaus.Add(new HangCau() { IdCau = idCau, IdHang = h.IdHang, Index = 1 });
+                    }
+                }
+
+                QuestionUtil.GetContext().Dapans.AddRange(dapans);
+                await QuestionUtil.GetContext().SaveChangesAsync();
+                QuestionUtil.restoreDB();
+            
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ActionName("Sua")]
+        public async Task<IActionResult> Sua_Post(IFormFile hinh)
+        {
+            try
+            {
+                UserGplx dtu = JsonConvert.DeserializeObject<UserGplx>(HttpContext.Request.Cookies["UserGplx"]);
+                if (!CheckLogin(dtu.Username, dtu.Password))
+                {
+                    return RedirectToAction("Login");
+                }
+            }
+            catch
+            {
+                return RedirectToAction("Login");
+            }
+
+            int idCau = int.Parse(Request.Form["IdCau"].ToString());
+            bool diemLiet = !string.IsNullOrEmpty(Request.Form["required"]);
+            int idChuong = int.Parse(Request.Form["IdChuongNavigation.IdChuong"].ToString());
+            string cauHoi = Request.Form["Cauhoi"].ToString();
+            string goiY = Request.Form["Goiy"].ToString();
+            string[] tthangs = Request.Form["tthang[]"];
+            string[] correctValues = Request.Form["Correct[]"];
+            string[] textValues = Request.Form["Text[]"];
+
+            Cau cauNew = new Cau() { IdCau = idCau, IdChuong = idChuong, Stt = idCau };
             Cau cau = QuestionUtil.GetContext().Caus.Find(cauNew.IdCau);
 
             if (cau != null)
             {
                 cau.IdChuong = idChuong;
                 QuestionUtil.GetContext().SaveChanges();
-            }
-                        
 
-            List<Ttcau> ttcau = new List<Ttcau>(){ new Ttcau() {IdTtcau=idCau, IdCau = idCau,Cauhoi = cauHoi,Diemliet = diemLiet,Goiy = goiY } };
+                // Retrieve existing image data
+                byte[] fileBytes = cau.Ttcaus.FirstOrDefault()?.Hinhcauhoi ?? new byte[0];
 
-            byte[] fileBytes = new byte[0];
-
-            if (hinh != null && hinh.Length > 0)
-            {
-                 using (var memoryStream = new MemoryStream())
-                 {
-                    hinh.CopyTo(memoryStream);
-                    fileBytes = memoryStream.ToArray();
-                 }
-            }
-            ttcau.ElementAt(0).Hinhcauhoi = fileBytes;
-
-            QuestionUtil.GetContext().Ttcaus.RemoveRange(QuestionUtil.GetContext().Ttcaus.Where(e=>e.IdCau == idCau).ToList());
-            QuestionUtil.GetContext().Ttcaus.AddRange(ttcau);
-            /** Add Dapans **/
-            QuestionUtil.GetContext().Dapans.RemoveRange(QuestionUtil.GetContext().Dapans.Where(d => d.IdCau == cauNew.IdCau));
-            List<Dapan> dapans = new List<Dapan>();
-            for (int j = 0; j < textValues.Length; j++)
-            {
-                dapans.Add(new Dapan()
+                // Update image data if a new image is provided
+                if (hinh != null && hinh.Length > 0)
                 {
-                    IdCau = idCau,
-                    IdDapan = j + 1,
-                    Dapan1 = textValues[j],
-                    Dapandung = bool.Parse(correctValues[j])
-                });
-            }
-
-            QuestionUtil.GetContext().HangCaus.RemoveRange(QuestionUtil.GetContext().HangCaus.Where(h => h.IdCau == cau.IdCau));
-            int i = 0;
-            foreach (Hang h in QuestionUtil.GetAllHang())
-            {
-                if (tthangs[i++] == "1")
-                {
-                    QuestionUtil.GetContext().HangCaus.Add(new HangCau() { IdCau = idCau, IdHang = h.IdHang, Index = 1 });
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await hinh.CopyToAsync(memoryStream);
+                        fileBytes = memoryStream.ToArray();
+                    }
                 }
+
+                List<Ttcau> ttcau = new List<Ttcau>() {
+            new Ttcau() { IdTtcau = idCau, IdCau = idCau, Cauhoi = cauHoi, Diemliet = diemLiet, Goiy = goiY, Hinhcauhoi = fileBytes }
+        };
+
+                QuestionUtil.GetContext().Ttcaus.RemoveRange(QuestionUtil.GetContext().Ttcaus.Where(e => e.IdCau == idCau).ToList());
+                QuestionUtil.GetContext().Ttcaus.AddRange(ttcau);
+
+                // Update Dapans
+                QuestionUtil.GetContext().Dapans.RemoveRange(QuestionUtil.GetContext().Dapans.Where(d => d.IdCau == cauNew.IdCau));
+                List<Dapan> dapans = new List<Dapan>();
+                for (int j = 0; j < textValues.Length; j++)
+                {
+                    dapans.Add(new Dapan()
+                    {
+                        IdCau = idCau,
+                        IdDapan = j + 1,
+                        Dapan1 = textValues[j],
+                        Dapandung = bool.Parse(correctValues[j])
+                    });
+                }
+
+                // Update HangCaus
+                QuestionUtil.GetContext().HangCaus.RemoveRange(QuestionUtil.GetContext().HangCaus.Where(h => h.IdCau == cau.IdCau));
+                int i = 0;
+                foreach (Hang h in QuestionUtil.GetAllHang())
+                {
+                    if (tthangs[i++] == "1")
+                    {
+                        QuestionUtil.GetContext().HangCaus.Add(new HangCau() { IdCau = idCau, IdHang = h.IdHang, Index = 1 });
+                    }
+                }
+
+                // Save changes
+                QuestionUtil.GetContext().Dapans.AddRange(dapans);
+                await QuestionUtil.GetContext().SaveChangesAsync();
+                QuestionUtil.restoreDB();
             }
 
-            QuestionUtil.GetContext().Dapans.AddRange(dapans);
-           await QuestionUtil.GetContext().SaveChangesAsync();
-            QuestionUtil.restoreDB();
             return RedirectToAction("Index");
         }
+
+
 
         public IActionResult HangLaiXe()
         {

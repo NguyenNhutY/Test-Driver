@@ -15,8 +15,6 @@ export class NavMenu extends Component {
             selectedLicenseType: {},
             licenseTypes: [],
             darkMode: false,
-            check: false,
-            inputcheck: "",
             collapsed: true // Thêm trạng thái cho việc ẩn hiện thanh điều hướng trên di động
         };
     }
@@ -58,31 +56,20 @@ export class NavMenu extends Component {
         }));
     };
 
-
+    // Hàm xử lý khi người dùng nhấn OK trong modal
     submitForm = () => {
-        const { selectedLicenseType, inputcheck } = this.state;
-
+        const { selectedLicenseType } = this.state;
         if (selectedLicenseType) {
-            if (inputcheck.toLowerCase() === selectedLicenseType.thongtin.toLowerCase()) {
-                if (selectedLicenseType.idHang)
-                    localStorage.setItem('HANG', JSON.stringify(selectedLicenseType));
-                this.setState({ showModal: false });
-                window.location.reload(false);
-            } else {
-                alert('Nội dung nhập vào không khớp với hạng đã chọn');
-            }
+            // Lưu hạng GPLX vào localStorage
+            if (selectedLicenseType.idHang)
+                localStorage.setItem('HANG', JSON.stringify(selectedLicenseType));
+            // Đóng modal sau khi đã chọn hạng
+            this.setState({ showModal: false });
+            window.location.reload(false);
         } else {
             alert('Vui lòng chọn một hạng GPLX');
         }
     }
-
-    // Hàm xử lý khi người dùng nhấn OK trong modal
-    checked = (e) => {
-        this.setState({
-            inputcheck: e.target.value
-        });
-    }
- 
 
     render() {
         const { licenseTypes } = this.state;
@@ -90,15 +77,15 @@ export class NavMenu extends Component {
         // Kiểm tra nếu licenseTypes chưa được thiết lập
         if (licenseTypes.length === 0) {
             return <div>Loading...</div>; // Hiển thị một thông báo tải
-        }  
+        }
 
         return (
             <header>
-                <Navbar className={`navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3 ${this.state.darkMode ? 'textwhite' : ''}`} container light>
+                <Navbar className={`navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3 ${this.state.darkMode ? 'darkMode' : ''}`} container light>
                     <div className="navbar-links_logo">
                         <img src={logo} alt="logo" />
                     </div>
-                    <NavbarBrand className = "" tag={Link} to="/">DemoGPLX</NavbarBrand>
+                    <NavbarBrand tag={Link} to="/">DemoGPLX</NavbarBrand>
                     <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
                     <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={!this.state.collapsed} navbar>
                         <ul className="navbar-nav flex-grow">
@@ -112,7 +99,7 @@ export class NavMenu extends Component {
                                 <NavLink tag={Link} className=" pt-3 text-nav  text-dark" to="/about">Thanks</NavLink>
                             </NavItem>
                             <NavItem className=" pt-2">
-                                <button className="ml-5 btn btn-primary" onClick={() => this.openModal()}>{this.state.selectedLicenseType.thongtin != undefined ? "HẠNG: " + this.state.selectedLicenseType.thongtin : "VUI LÒNG CHỌN HẠNG"} </button>
+                                <button className="btn btn-primary" onClick={() => this.openModal()}>{this.state.selectedLicenseType.thongtin != undefined ? "HẠNG: " + this.state.selectedLicenseType.thongtin : "VUI LÒNG CHỌN HẠNG"} </button>
                             </NavItem>
                             <NavItem>
                                 {/* Sử dụng DarkModeToggle component */}
@@ -146,8 +133,7 @@ export class NavMenu extends Component {
                                 </div>
                                 {/* Footer */}
                                 <div className="bg-gray-200 rounded-b-lg p-4 flex justify-around">
-                                    <input type="text hover:bg-gray-500 hover:text-white" onChange={this.checked} value={this.state.inputcheck}></input>
-                                    <button type=" button hover:bg-gray-500 hover:text-white" onClick={this.submitForm}><span>OK</span></button>
+                                    <button type="button" onClick={this.submitForm}><span>OK</span></button>
                                 </div>
                             </div>
                         </div>

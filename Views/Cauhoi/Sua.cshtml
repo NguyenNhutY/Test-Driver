@@ -10,7 +10,7 @@
     }
     int n = Model.IdChuong;
     lsTopic.ElementAt(n - 1).Selected = true;
-    var action = "Them";
+    var action = "Sua";
 }
 
 <form method="post" action="../Cauhoi/@action" enctype="multipart/form-data">
@@ -43,13 +43,26 @@
                     <tr>
                         <td colspan="3">
                             <label asp-for="Ttcaus.ElementAt(0).Hinhcauhoi" class="form-label"></label>
-                            <input type="file" class="form-control-file" name="hinh" id="hinh" />
+                            <input type="file" class="form-control-file" name="hinh" id="hinh" onchange="displayImage(event)" src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.Ttcaus.ElementAt(0).Hinhcauhoi))" />
                             @if (Convert.ToBase64String(Model.Ttcaus.ElementAt(0).Hinhcauhoi) != "")
                             {
                                 <img id="image" src="data:image/jpeg;base64,@(Convert.ToBase64String(Model.Ttcaus.ElementAt(0).Hinhcauhoi))" alt="Hình ảnh câu hỏi" />
                             }
                         </td>
                     </tr>
+                    <script>
+                        function displayImage(event) {
+                            var file = event.target.files[0];
+                            if (file) {
+                                var reader = new FileReader();
+                                reader.onload = function (e) {
+                                    var imgElement = document.getElementById('image');
+                                    imgElement.src = e.target.result;
+                                }
+                                reader.readAsDataURL(file);
+                            }
+                        }
+                    </script>
                     <tr>
                         <td colspan="3">
                             <label asp-for="Ttcaus.ElementAt(0).Goiy" class="form-label"></label>
@@ -123,7 +136,7 @@
                     </tr>
                     <tr>
                         <td colspan="3">
-                            <input type="submit" class="btn btn-success" id="submit" value="THÊM" />
+                            <input type="submit" class="btn btn-success" id="submit" value="SỬA" />
                         </td>
                     </tr>
                 </table>

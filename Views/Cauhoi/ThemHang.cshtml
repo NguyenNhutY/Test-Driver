@@ -68,7 +68,7 @@
                             <label>@ViewBag.Chuong[i].ThongTinChuong</label>
                             <br />
                             <label asp-for="ElementAt(0).Soluong"></label>
-                            <input name="Soluong[]" />
+                            <input name="Soluong[]" type="number" min="0" value="0" />
                         </div>
                     </td>
                 </tr>
@@ -126,10 +126,10 @@
                             {
                                 if (Model.ElementAt(j).IdChuong == @ViewBag.Chuong[i].IdChuong)
                                 {
-                                    <input name="Soluong[]" value="@Model.ElementAt(j++).Soluong" />
+                                    <input name="Soluong[]" type="number" min="0" value="@Model.ElementAt(j++).Soluong" />
                                 }
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                                 <input name="Soluong[]" value="0" />
                             }
